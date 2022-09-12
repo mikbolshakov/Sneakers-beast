@@ -3,7 +3,6 @@ import Card from "../components/Card";
 
 function Home({
   items,
-  cartItems,
   searchValue,
   setSearchValue,
   onChangeSearchInput,
@@ -11,16 +10,15 @@ function Home({
   onAddToCart,
   isLoading,
 }) {
+
   function renderItems() {
     const filtredItems = items.filter((item) =>
-      item.title.toLowerCase().includes(searchValue.toLowerCase())
-    );
+      item.title.toLowerCase().includes(searchValue.toLowerCase()));
     return (isLoading ? [...Array(8)] : filtredItems).map((item) => (
       <Card
         key={item.title}
         onFavorite={onAddToFavorite}
         onPlus={onAddToCart}
-        added={cartItems.some((obj) => Number(obj.id) === Number(item.id))}
         loading={isLoading}
         {...item}
       />
