@@ -1,84 +1,144 @@
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import axios from "axios";
+import Drawer from "./components/Drawer";
+import Header from "./components/Header";
+import Home from "./pages/Home";
+import Favorites from "./pages/Favorites";
+
 function App() {
+  const [items, setItems] = React.useState([]);
+  const [cartItems, setCartItems] = React.useState([]);
+  const [favorites, setFavorites] = React.useState([]);
+  const [searchValue, setSearchValue] = React.useState("");
+  const [cartOpened, setCartOpened] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    /*fetch("https://631af04afae3df4dcfef9e3d.mockapi.io/items")
+      .then((response) => {
+        return response.json();
+      })
+      .then((json) => {
+        setItems(json);
+      }); */
+
+    /* axios
+      .get("https://631af04afae3df4dcfef9e3d.mockapi.io/items")
+      .then((response) => {
+        setItems(response.data);
+      });
+    axios
+      .get("https://631af04afae3df4dcfef9e3d.mockapi.io/cart")
+      .then((response) => {
+        setCartItems(response.data);
+      });
+    axios
+      .get("https://631af04afae3df4dcfef9e3d.mockapi.io/favorites")
+      .then((response) => {
+        setFavorites(response.data);
+      });*/
+
+    async function fetchData() {
+      setIsLoading(true);
+      const cartResponse = await axios.get(
+        "https://631af04afae3df4dcfef9e3d.mockapi.io/cart"
+      );
+      const favoriteResponse = await axios.get(
+        "https://631af04afae3df4dcfef9e3d.mockapi.io/favorites"
+      );
+      const itemsResponse = await axios.get(
+        "https://631af04afae3df4dcfef9e3d.mockapi.io/items"
+      );
+      setIsLoading(false);
+      setCartItems(cartResponse.data);
+      setFavorites(favoriteResponse.data);
+      setItems(itemsResponse.data);
+    }
+    fetchData();
+  }, []);
+
+  function onAddToCart(obj) {
+    try {
+      if (cartItems.find((item) => Number(item.id) === Number(obj.id))) {
+        axios.delete(
+          `https://631af04afae3df4dcfef9e3d.mockapi.io/cart/${obj.id}`
+        );
+        setCartItems((prev) =>
+          prev.filter((item) => Number(item.id) !== Number(obj.id))
+        );
+      } else {
+        axios.post("https://631af04afae3df4dcfef9e3d.mockapi.io/cart", obj);
+        setCartItems((prev) => [...prev, obj]);
+      }
+    } catch (error) {
+      alert("Ошибка при добавлении в корзину");
+      console.error(error);
+    }
+  }
+
+  function onChangeSearchInput(e) {
+    setSearchValue(e.target.value);
+  }
+
+  function onRemoveItem(id) {
+    axios.delete(`https://631af04afae3df4dcfef9e3d.mockapi.io/cart/${id}`);
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  }
+
+  async function onAddToFavorite(obj) {
+    try {
+      if (favorites.find((favObj) => favObj.id === obj.id)) {
+        axios.delete(
+          `https://631af04afae3df4dcfef9e3d.mockapi.io/favorites/${obj.id}`
+        );
+        setFavorites((prev) => prev.filter((item) => item.id !== obj.id));
+      } else {
+        const { data } = await axios.post(
+          "https://631af04afae3df4dcfef9e3d.mockapi.io/favorites",
+          obj
+        );
+        setFavorites((prev) => [...prev, data]);
+      }
+    } catch (error) {
+      alert("Не удалось добавить в избранное");
+    }
+  }
+
   return (
     <div className="wrapper clear">
-      <header className="d-flex justify-between align-center p-40">
-        <div className="d-flex align-center">
-          <img width={40} height={40} src="img/logo.png" alt="LogoType" />
-          <div>
-            <h3 className="text-uppercase">React Sneakers</h3>
-            <p className="opacity-5">Магазин лучших кроссовок</p>
-          </div>
-        </div>
-        <ul className="d-flex">
-          <li className="mr-30" cu-p>
-            <img width={18} height={18} src="img/cart.svg" alt="Корзина" />
-            <span>1205 руб.</span>
-          </li>
-          <li className="mr-20 cu-p">
-            <img width={18} height={18} src="/img/user.svg" alt="Пользователь" />
-          </li>
-        </ul>
-      </header>
-      <div className="content p-40">
-        <h1 className="mb-40">Все кроссовки</h1>
+      {cartOpened && (
+        <Drawer
+          items={cartItems}
+          onClose={() => setCartOpened(false)}
+          onRemove={onRemoveItem}
+        />
+      )}
+      <Header onClickCart={() => setCartOpened(true)} />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Home
+              items={items}
+              cartItems={cartItems}
+              searchValue={searchValue}
+              setSearchValue={setSearchValue}
+              onChangeSearchInput={onChangeSearchInput}
+              onAddToFavorite={onAddToFavorite}
+              onAddToCart={onAddToCart}
+              sLoading={isLoading}
+            />
+          }
+        />
 
-
-
-        <div className="d-flex">
-        <div className="card">
-          <img width={133} height={112} src="/img/sneakers/1.jpg" alt="Sneakers" />
-          <h5>Мужские Кроссовки Nike Blazer Mid Suede</h5>
-          <div className="d-flex justify-between align-center">
-            <div className="d-flex flex-column">
-              <span>Цена:</span>
-              <b>12 999 руб.</b>
-            </div>
-            <button className="button">
-              <img width={11} height={11} src="/img/plus.svg" alt="Plus" />
-            </button>
-          </div>
-        </div>
-        <div className="card">
-          <img width={133} height={112} src="/img/sneakers/2.jpg" alt="Sneakers" />
-          <h5>Мужские Кроссовки Nike Blazer Mid Suede</h5>
-          <div className="d-flex justify-between align-center">
-            <div className="d-flex flex-column">
-              <span>Цена:</span>
-              <b>12 999 руб.</b>
-            </div>
-            <button className="button">
-              <img width={11} height={11} src="/img/plus.svg" alt="Plus" />
-            </button>
-          </div>
-        </div>
-        <div className="card">
-          <img width={133} height={112} src="/img/sneakers/3.jpg" alt="Sneakers" />
-          <h5>Мужские Кроссовки Nike Blazer Mid Suede</h5>
-          <div className="d-flex justify-between align-center">
-            <div className="d-flex flex-column">
-              <span>Цена:</span>
-              <b>12 999 руб.</b>
-            </div>
-            <button className="button">
-              <img width={11} height={11} src="/img/plus.svg" alt="Plus" />
-            </button>
-          </div>
-        </div>
-        <div className="card">
-          <img width={133} height={112} src="/img/sneakers/4.jpg" alt="Sneakers" />
-          <h5>Мужские Кроссовки Nike Blazer Mid Suede</h5>
-          <div className="d-flex justify-between align-center">
-            <div className="d-flex flex-column">
-              <span>Цена:</span>
-              <b>12 999 руб.</b>
-            </div>
-            <button className="button">
-              <img width={11} height={11} src="/img/plus.svg" alt="Plus" />
-            </button>
-          </div>
-        </div>
-        </div>
-      </div>
+        <Route
+          path="/favorites"
+          element={
+            <Favorites items={favorites} onAddToFavorite={onAddToFavorite} />
+          }
+        />
+      </Routes>
     </div>
   );
 }
