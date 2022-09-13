@@ -1,6 +1,6 @@
 # Sneakers-beast
 
-This is a website for a small sneaker store.
+This is a website for a small [SNEAKER STORE](https://mikbolshakov.github.io/Sneakers-beast/).
 
 You can: add and remove items to favorites; add and remove items to the cart; view the shopping list; search by product name. The website uses MockApi.io for the database. All changes are saved there.
 
