@@ -141,7 +141,7 @@ function App() {
                 onChangeSearchInput={onChangeSearchInput}
                 onAddToFavorite={onAddToFavorite}
                 onAddToCart={onAddToCart}
-                sLoading={isLoading}
+                isLoading={isLoading}
               />
             }
           />

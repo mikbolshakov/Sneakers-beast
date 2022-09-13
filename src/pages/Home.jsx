@@ -14,7 +14,7 @@ function Home({
   function renderItems() {
     const filtredItems = items.filter((item) =>
       item.title.toLowerCase().includes(searchValue.toLowerCase()));
-    return (isLoading ? [...Array(8)] : filtredItems).map((item) => (
+    return (isLoading ? (Array(8).fill(<Card loading={isLoading}/>)) : filtredItems.map((item) => (
       <Card
         key={item.title}
         onFavorite={onAddToFavorite}
@@ -22,7 +22,7 @@ function Home({
         loading={isLoading}
         {...item}
       />
-    ));
+    )));
   }
 
   return (
@@ -37,7 +37,7 @@ function Home({
             <img
               onClick={() => setSearchValue("")}
               className="clear cu-p"
-              src="img/btn-remove.svg"
+              src="/img/btn-remove.svg"
               alt="Clear"
             />
           )}

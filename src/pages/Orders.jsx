@@ -3,10 +3,7 @@ import axios from 'axios';
 
 import Card from '../components/Card';
 
-import AppContext from '../context';
-
 function Orders() {
-  const { onAddToFavorite, onAddToCart } = React.useContext(AppContext);
   const [orders, setOrders] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -29,9 +26,9 @@ function Orders() {
         <h1>Мои заказы</h1>
       </div>
       <div className="d-flex flex-wrap">
-        {(isLoading ? [...Array(8)] : orders).map((item) => (
+        {(isLoading ? (Array(8).fill(<Card loading={isLoading}/>)) : orders.map((item) => (
           <Card key={item.title} loading={isLoading} {...item} />
-        ))}
+        )))}
       </div>
     </div>
   );
